@@ -41,11 +41,12 @@ func (objAcc *Account)GetVote(){
 }
 
 //функция для голосования за другого пользователя
-func (objAcc *Account)Vote(reseiver *Account){
+func (objAcc *Account)Vote(reseiver *Account) *transaction.Transaction {
 	var message string //формируем стоку, где просто говорим о том, что я хочу проголосовать за такого-то пользователя (необходяма просто для подтверждения транзакции)
 	message = "Person " + strconv.FormatUint(uint64(objAcc.ID), 10) + " vote for person "+ strconv.FormatUint(uint64(reseiver.ID), 10)
 	sha1.New()
 	resHach := sha1.Sum([]byte(message)) //хешируем наше сообщение
 	r,s:=objAcc.keys.SingData(resHach)	//подписываем
-	transaction.Vote(objAcc, reseiver,r,s, resHach)	//отправляем на проверку и подписание транзакции
+	resTrans:=new(transaction.Transaction)
+	return resTrans.Vote(objAcc, reseiver,r,s, resHach)	//отправляем на проверку и подписание транзакции
 }
