@@ -1,32 +1,28 @@
 package main
 
 import (
-	"blockchain/key"
-	"blockchain/signature"
-	"bufio"
-	"crypto/sha1"
-	"fmt"
-	"os"
+	blockchane "blockchain/block"
+	"blockchain/transaction"
 )
 
 func main() {
 
-	fmt.Println("Hello, enter the message: ")
+	mainchain := new(blockchane.Blockchain)
+	mainchain.InitBlockchane()
+	mainchain.AddUser()
+	mainchain.AddUser()
+	mainchain.AddUser()
 
-	in:=bufio.NewReader(os.Stdin)
-	message, err1:= in.ReadBytes( 10)
-	if(err1 != nil){
-		return
-	}
-	sha1.New()
-	keyobj:=new(keypair.Key)
-	keyobj.GenerateKeys()
-	fmt.Printf("%v\n", message)
-	message1 := sha1.Sum(message)
-	fmt.Printf("%v\n", message1)
+	var transArr []transaction.Transaction
 
+	currentUser := mainchain.GetObjUser(0)
+	transArr = append(transArr, *currentUser.Vote(mainchain.GetObjUser(1)))
+	currentUser = mainchain.GetObjUser(2)
+	transArr = append(transArr, *currentUser.Vote(mainchain.GetObjUser(1)))
 
-	r,s:=signature.SingData(keyobj, message1 )
-	b:=signature.VeryfySignature(r,s, message1, keyobj)
-	fmt.Printf("%v", b)
+	block := new(blockchane.Block)
+	block.CreateBlock(transArr, mainchain.GetLastBlock())
+
+	mainchain.ValidateBlock(block) //бавить блок
+	mainchain.PrevBalance()
 }
